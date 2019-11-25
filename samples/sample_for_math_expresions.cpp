@@ -6,14 +6,21 @@ using std::vector;
 
 int main(int argc, char *argv[])
 {
-	for (int i = 1; i < argc; i++)
+	if (argc > 1)
+		for (int i = 1; i < argc; i++)
+		{
+			string s;
+			s = argv[i];
+			vector <string> obl;
+			std::cout << get_res_from_math_expresions(s) << "\n";
+		}
+	else
 	{
 		string s;
-		s = argv[i];
-		vector <vector <char> > obl;
+		std :: cin >> s;
+		vector <string> obl;
 		Stack <value_operation> operation;
-		check_and_convert_str_to_Poland(s, obl, operation);
-		std::cout << get_result_from_Poland(obl) << "\n";
+		std::cout << get_res_from_math_expresions(s) << "\n";
 	}
 	return 0;
 }

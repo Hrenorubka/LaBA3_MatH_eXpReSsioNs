@@ -1,6 +1,6 @@
 #include "Func_for_math_expresions.h"
 
-void status_1(string &s, vector<vector <char> > &val, Stack <value_operation> &operation, int &index, int &status)
+void status_1(string &s, vector<string> &val, Stack <value_operation> &operation, int &index, int &status)
 {
 	if (s[index] == '\0')
 	{
@@ -8,13 +8,14 @@ void status_1(string &s, vector<vector <char> > &val, Stack <value_operation> &o
 	}
 	else if (s[index] == '(')
 	{
-		operation.push({ 0, s[index] });
+		value_operation obl('(');
+		operation.push(obl);
 		status = 1;
 	}
-	else if ((s[index] >= 48) && (s[index] <= 57))
+	else if ((s[index] >= (int)'0') && (s[index] <= (int)'9') || (s[index] == ','))
 	{
-		vector <char> obl;
-		while (((s[index] >= 48) && (s[index] <= 57)))
+		string obl;
+		while (((s[index] >= (int)'0') && (s[index] <= (int)'9')))
 		{
 			obl.push_back(s[index]);
 			index++;
@@ -24,10 +25,10 @@ void status_1(string &s, vector<vector <char> > &val, Stack <value_operation> &o
 		status = 2;
 	}
 	else
-		status = 4;
+		throw 1;
 }
 
-void status_2(string &s, vector<vector <char> > &val, Stack <value_operation> &operation, int &index, int &status)
+void status_2(string &s, vector<string> &val, Stack <value_operation> &operation, int &index, int &status)
 {
 	if (s[index] == '\0')
 	{
@@ -37,79 +38,38 @@ void status_2(string &s, vector<vector <char> > &val, Stack <value_operation> &o
 	{
 		while ((!operation.empty()) && (operation.top().func != '('))
 		{
-			vector <char> obl;
+			string obl;
 			obl.push_back(operation.top().func);
 			val.push_back(obl);
 			operation.pop();
 		}
-		if (operation.empty())
-		{
-			status = 4;
-			return;
-		}
 		operation.pop();
 		status = 2;
 	}
-	else if ((s[index] == '+') || (s[index] == '-'))
+	else if ((s[index] == '+') || (s[index] == '-') || (s[index] == '*') || (s[index] == '/'))
 	{
-		if (operation.empty())
+		value_operation cloud9_fake(s[index]);
+		while ((!operation.empty()) && (cloud9_fake.value <= operation.top().value))
 		{
-			operation.push({ 1, s[index] });
+			string obl;
+			obl.push_back(operation.top().func);
+			val.push_back(obl);
+			operation.pop();
 		}
-		else if (operation.top().value >= 1)
-		{
-
-			while ((!operation.empty()) && (operation.top().value >= 1))
-			{
-				vector <char> obl;
-				obl.push_back(operation.top().func);
-				val.push_back(obl);
-				operation.pop();
-			}
-			operation.push({ 1, s[index] });
-		}
-		else
-			operation.push({ 1, s[index] });
-		status = 1;
-	}
-	else if ((s[index] == '*') || (s[index] == '/'))
-	{
-		if (operation.empty())
-		{
-			operation.push({ 2, s[index] });
-		}
-		else if (operation.top().value >= 2)
-		{
-			while ((!operation.empty()) && (operation.top().value >= 2))
-			{
-				vector <char> obl;
-				obl.push_back(operation.top().func);
-				val.push_back(obl);
-				operation.pop();
-			}
-			operation.push({ 2, s[index] });
-		}
-		else
-			operation.push({ 2, s[index] });
+		operation.push(cloud9_fake);
 		status = 1;
 	}
 	else
 	{
-		status = 4;
+		throw 1;
 	}
 }
 
-void status_3(vector<vector <char> > &val, Stack <value_operation> &operation, int &status)
+void status_3(vector<string> &val, Stack <value_operation> &operation, int &status)
 {
 	while (!operation.empty())
 	{
-		if (operation.top().func == '(')
-		{
-			throw 1;
-			status = 4;
-			return;
-		}
-		vector <char> obl;
+		string obl;
 		obl.push_back(operation.top().func);
 		val.push_back(obl);
 		operation.pop();
@@ -117,8 +77,40 @@ void status_3(vector<vector <char> > &val, Stack <value_operation> &operation, i
 	status = 3;
 }
 
-bool check_and_convert_str_to_Poland(string s, vector <vector <char>> &val, Stack <value_operation> &operation)
+void check_str_on_brackets(string s)
 {
+	Stack <char> brackets;
+	bool flag = true;
+	for (int i = 0; i <= s.length(); i++)
+	{
+		switch (s[i])
+		{
+		case '(':
+			brackets.push(s[i]);
+			flag = false;
+			break;
+		case ')': 
+			if ((flag) && (brackets.top() == '('))
+				brackets.pop();
+			else
+				throw 1;
+			break;
+		default: 
+			flag = true;
+			break;
+		}
+		
+	}
+	if (!brackets.empty())
+	{
+		std::cout << brackets.top();
+		throw 1;
+	}
+}
+
+void convert_str_to_Poland(string s, vector <string> &val)
+{
+	Stack <value_operation> operation;
 	int status = 1;
 	for (int i = 0; i <= s.length(); i++)
 	{
@@ -133,40 +125,34 @@ bool check_and_convert_str_to_Poland(string s, vector <vector <char>> &val, Stac
 		else if (status == 3)
 		{
 			status_3(val, operation, status);
-			if (status == 3)
-				return true;
-			return false;
-		}
-		else if (status == 4)
-		{
-			throw 1;
-			return false;
+			return;
 		}
 	}
-	if (status == 3)
+	if (status == 4)
+	{
+		throw 1;
+	}
+	else if (status == 3)
 	{
 		status_3(val, operation, status);
-		if (status == 3)
-			return true;
-		return false;
 	}
 }
 
-int get_result_from_Poland(vector <vector <char>> poland)
+double get_result_from_Poland(vector <string> poland)
 {
-	Stack <int> numb;
+	Stack <double> numb;
+	for (int j = 0; j < poland.size(); j++)
+		std::cout << poland[j] << ' ';
 	for (int i = 0; i < poland.size(); i++)
 	{
-		if ((poland[i][0] >= 48) && (poland[i][0] <= 57))
+		if ((poland[i][0] >= (int)'0') && (poland[i][0] <= (int)'9'))
 		{
-			int tmp = 0;
-			for (int j = 0; j < poland[i].size(); j++)
-				tmp = tmp * 10 + poland[i][j] - 48;
+			double tmp = std::stod(poland[i]);
 			numb.push(tmp);
 		}
 		else
 		{
-			int res = 0;
+			double res = 0;
 			res = numb.top();
 			numb.pop();
 			switch (poland[i][0])
@@ -188,6 +174,8 @@ int get_result_from_Poland(vector <vector <char>> poland)
 			}
 			case '/':
 			{
+				if (res == 0)
+					throw 1;
 				res = numb.top() / res;
 				break;
 			}
@@ -199,4 +187,12 @@ int get_result_from_Poland(vector <vector <char>> poland)
 		}
 	}
 	return numb.top();
+}
+
+double get_res_from_math_expresions(string s)
+{
+	vector <string> val;
+	check_str_on_brackets(s);
+	convert_str_to_Poland(s, val);
+	return get_result_from_Poland(val);
 }

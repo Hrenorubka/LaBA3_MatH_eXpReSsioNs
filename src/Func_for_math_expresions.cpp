@@ -141,8 +141,6 @@ void convert_str_to_Poland(string s, vector <string> &val)
 double get_result_from_Poland(vector <string> poland)
 {
 	Stack <double> numb;
-	for (int j = 0; j < poland.size(); j++)
-		std::cout << poland[j] << ' ';
 	for (int i = 0; i < poland.size(); i++)
 	{
 		if ((poland[i][0] >= (int)'0') && (poland[i][0] <= (int)'9'))

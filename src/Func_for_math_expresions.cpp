@@ -12,7 +12,7 @@ void status_1(string &s, vector<string> &val, Stack <value_operation> &operation
 		operation.push(obl);
 		status = 1;
 	}
-	else if ((s[index] >= (int)'0') && (s[index] <= (int)'9') || (s[index] == ','))
+	else if ((s[index] >= (int)'0') && (s[index] <= (int)'9') || (s[index] == '.'))
 	{
 		string obl;
 		while (((s[index] >= (int)'0') && (s[index] <= (int)'9')))
@@ -20,6 +20,18 @@ void status_1(string &s, vector<string> &val, Stack <value_operation> &operation
 			obl.push_back(s[index]);
 			index++;
 		}
+		if (s[index] == '.')
+		{
+			obl.push_back(s[index]);
+			index++;
+			while (((s[index] >= (int)'0') && (s[index] <= (int)'9')))
+			{
+				obl.push_back(s[index]);
+				index++;
+			}
+		}
+		if (obl[obl.length()-1] == '.')
+			throw 1;
 		index--;
 		val.push_back(obl);
 		status = 2;

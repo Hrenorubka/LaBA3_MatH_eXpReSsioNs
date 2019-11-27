@@ -151,3 +151,27 @@ TEST(math_expresions_b3, cant_divide_zero_v2)
 	string s = "(10*14+6)/(3/3-1)";
 	ASSERT_ANY_THROW(get_res_from_math_expresions(s));
 }
+
+TEST(math_expresions_b1, can_check_false_fraction_v1)
+{
+	string s = "3.123.31";
+	ASSERT_ANY_THROW(get_res_from_math_expresions(s));
+}
+
+TEST(math_expresions_b1, can_check_false_fraction_v2)
+{
+	string s = "1.2.34+0.6*7.98";
+	ASSERT_ANY_THROW(get_res_from_math_expresions(s));
+}
+
+TEST(math_expresions_b1, can_check_true_fraction_v1)
+{
+	string s = "1.2+0.6*7.98";
+	ASSERT_NO_THROW(get_res_from_math_expresions(s));
+}
+
+TEST(math_expresions_b1, can_check_true_fraction_v2)
+{
+	string s = "(1.2+3.8)*1.5";
+	EXPECT_EQ(7.5 ,get_res_from_math_expresions(s));
+}
